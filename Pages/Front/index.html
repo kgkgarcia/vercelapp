@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../Css/estilo.css">
+    <link rel="icon" href="../../Imagens/logo.jpg">
+    <script src="https://kit.fontawesome.com/a563638dec.js" crossorigin="anonymous"></script>
+    <title>MyTicket</title>
+    <style>
+        #user-name {
+            text-decoration: none;
+            /* Remove o sublinhado */
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div>
+            <div class="lista">
+                <div>
+                    <ul class="icon_menu">
+                        <li id="navegacao"><i class="fa-solid fa-bars"></i></li>
+                    </ul>
+                </div>
+                <div class="logo">
+                    <li><a href="http://localhost:8080" id="myticket">MyTicket</a></li>
+                </div>
+                <div>
+                    <ul class="nav_menu">
+                        <li><a href="http://localhost:8080/admin" id="dashboard"><i
+                                    class="fa-solid fa-screwdriver-wrench"></i></a>
+                        </li>
+                        <li><a href="#" id="perfil"><i class="fa-regular fa-user"></i></a>
+                        </li>
+                        <li><span id="user-name"></span><a href="#" id="sair"> <i
+                                    class="fa-solid fa-right-from-bracket"></i></a>
+                        </li>
+
+                        <li id="carinho"><a href="#" id="carrinho" onclick="abrirmodalcarrinho()"><i
+                                    class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></a></li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Modal de login-->
+    <div id="modal-container" class="modal-container">
+        <div class="modal">
+            <span class="close-button">&times;</span>
+            <img src="../../Imagens/logo.jpg" alt="Logo" class="admin">
+            <h2>Login</h2>
+            <form id="login">
+                <label for="username">Email:</label><br>
+                <input type="email" id="email" name="email"><br>
+                <label for="password">Password:</label><br>
+                <input type="password" id="password" name="password"><br>
+                <a href="criarconta.html">Criar Conta</a>
+                <input type="button" value="Login" class="botaolog" onclick="login()">
+            </form>
+        </div>
+    </div>
+
+    <!-- Barra de navegação lateral-->
+    <div class="nav-menu" id="navMenu">
+        <div class="search_container">
+            <input type="search" id="search" name="q" placeholder="Pesquisar...">
+            <button type="submit" id="search-button"><i class="fas fa-search"></i></button>
+        </div>
+        <ul>
+
+            <li>
+                <h2>CATEGORIAS</h2>
+            </li>
+            <li><a href="#" data-categoria-id="1">Desporto</a></li>
+            <li><a href="#" data-categoria-id="2">Cultura</a></li>
+            <li><a href="#" data-categoria-id="3">Música</a></li>
+            <li><a href="#" data-categoria-id="4">Arte</a></li>
+            <li><a href="#" data-categoria-id="5">Educação</a></li>
+            <li><a href="#" data-categoria-id="6">Viagens</a></li>
+            <li><a href="#" data-categoria-id="7">Tecnologia</a></li>
+        </ul>
+    </div>
+
+
+    <h3 class="titulo" id="tituloEventos">Próximos Eventos</h3>
+    <section class="eventos" id="eventosContainer">
+        <!-- Conteúdo da seção de eventos será inserido dinamicamente -->
+    </section>
+
+    <!-- Modal com informações de cada evento -->
+    <div id="myModal" class="modal-eventos">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="caption">
+            <h3 id="modalNome"></h3>
+            <p id="modalData"></p>
+            <p id="modalLocal"></p>
+            <p id="modalDescricao"></p>
+            <p id="modalPreco"></p>
+            <button class="botao" id="comprarBilhete" onclick="adicionarItemAoCarrinho()">Adicionar ao carrinho</button>
+        </div>
+    </div>
+
+
+    <!-- Modal de carrinho de compras -->
+    <div id="modalCarrinho" class="modal-carrinho">
+        <span class="close-button-carrinho">&times;</span>
+        <h2>Carrinho de Compras</h2>
+        <ul id="listaCarrinho">
+            <!-- Lista de itens do carrinho será renderizada aqui -->
+        </ul>
+        <div class="total">
+            <p>Total: € <span id="totalCarrinho">0.00</span></p>
+        </div>
+        <button class="botao" id="finalizarCompra" onclick="finalizarCompra()">Finalizar Compra</button>
+    </div>
+
+    <!-- Modal de alerta -->
+    <div id="alert-modal" class="modal-alert">
+        <div class="alert-modal-content">
+            <span class="close-alert">&times;</span>
+            <p id="alert-message"></p>
+            <button id="ok-button" class="ok-button">OK</button>
+        </div>
+    </div>
+
+
+
+
+
+    <a href="#" class="botao-voltar-topo" id="botaoVoltarTopo"><i class="fa-solid fa-up-long"></i></a>
+
+
+    <!-- Rodape do site-->
+    <footer>
+        <div class="menu">
+            <ul>
+                <li><a href="index.html">Página Inicial</a></li>
+            </ul>
+        </div>
+        <div class="empresa">
+            <h3>Sobre Nossa Empresa</h3>
+            <p>A MyTicket é uma plataforma líder na venda de bilhetes para uma ampla variedade de eventos.<br>Desde
+                grandes festivais até eventos locais, estamos aqui para conectar você aos melhores momentos.</p>
+        </div>
+        <div class="copy">
+            &copy; 2024 MyTicket. Todos os direitos reservados.
+        </div>
+    </footer>
+
+</body>
+
+<script>
+    window.addEventListener('scroll', function () {
+
+        var botaoVoltarTopo = document.getElementById('botaoVoltarTopo');
+
+        // Mostra o botão quando o utilizador rolar a página para baixo
+        if (window.scrollY > 100) {
+            botaoVoltarTopo.style.display = 'block';
+        } else {
+            botaoVoltarTopo.style.display = 'none';
+        }
+    });
+    // Função para rolar a página de volta ao topo
+    function voltarAoTopo() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+    function fecharMenu() {
+        document.getElementById("navMenu").classList.remove("open");
+        document.getElementById('navegacao').style.display = 'block';
+        document.body.classList.remove("menu-aberto");
+    }
+
+    document.getElementById('sair').onclick = function () {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('carrinhoId');
+        // alerta de logout 
+        showAlert("Sessão terminada!");
+        location.reload();
+    };
+
+    document.getElementById('perfil').addEventListener('click', function () {
+        // verificar se existe token se nao, mostrar  modal container de login se sim mostrar botao logout
+        if (localStorage.getItem('token') == null) {
+            document.getElementById('modal-container').style.display = 'block';
+        } else {
+            document.getElementById('sair').style.display = 'block';
+        }
+
+
+    });
+
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('modal-container').style.display = 'none';
+    });
+
+
+    window.addEventListener('click', function (event) {
+        if (event.target == document.getElementById('modal-container')) {
+            document.getElementById('modal-container').style.display = 'none';
+        }
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        if (localStorage.getItem('token') == null) {
+            document.getElementById('carinho').style.display = 'none';
+            document.getElementById('sair').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+        }
+
+
+        var navegacaoImg = document.getElementById("navegacao");
+        var navMenu = document.getElementById("navMenu");
+        // Função para fechar o menu
+
+        // Abrir o menu quando a imagem de navegação for clicada
+        navegacaoImg.addEventListener("click", function () {
+            navMenu.classList.toggle("open");
+            document.getElementById('navegacao').style.display = 'none';
+            document.body.classList.toggle("menu-aberto");
+        });
+
+        // Fechar o menu quando clicar fora dele
+        document.addEventListener("click", function (event) {
+            var clicadoDentroMenu = navMenu.contains(event.target);
+            var clicadoNoIconeNavegacao = navegacaoImg.contains(event.target);
+            if (!clicadoDentroMenu && !clicadoNoIconeNavegacao) {
+                fecharMenu();
+            }
+        });
+    });
+
+
+    const login = async () => {
+        var dados = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+        };
+        const response = await fetch("http://localhost:8080/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dados),
+        });
+
+        console.log(response.ok);
+        dados = await response.json();
+        if (!response.ok) {
+            alert("Erro ao fazer login");
+        } else {
+            // Guardar o token no local storage
+            localStorage.setItem("token", dados.token);
+            // Guardar os dados do utilizador no local storage
+            localStorage.setItem("user", JSON.stringify(dados.user));
+            getCarrinho();
+            window.location.href = "http://localhost:8080";
+        }
+    };
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const eventosContainer = document.getElementById('eventosContainer');
+
+        // Fazendo uma requisição AJAX para carregar os eventos do backend
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'http://localhost:8080/eventos/listar', true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const eventos = JSON.parse(xhr.responseText);
+                eventos.forEach(evento => {
+                    const cardEvento = `
+                    <div class="card-evento">
+                        <img src="${evento.foto}" alt="${evento.nome}">
+                        <h3>${evento.nome}</h3>
+                        <p>${evento.descricao || 'Descrição não disponível'}</p>
+                        <button class="botao" id="mais" onclick="openModal(${evento.id})">Ver mais</button>
+                    </div>
+                `;
+                    eventosContainer.innerHTML += cardEvento;
+                });
+            } else {
+                console.error('Falha ao carregar os eventos.');
+            }
+        };
+        xhr.send();
+    });
+
+    function openModal(eventId) {
+        fetch(`http://localhost:8080/eventos/listar/${eventId}`)
+            .then(response => response.json())
+            .then(evento => {
+                const dataFormatada = new Date(evento.data).toLocaleDateString('pt-PT', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                });
+
+                // Preencha os dados do modal com as informações do evento
+                document.getElementById('modalNome').textContent = evento.nome;
+                document.getElementById('modalData').textContent = `Data: ${dataFormatada}`;
+                document.getElementById('modalLocal').textContent = `Local: ${evento.localizacao}`;
+                document.getElementById('modalDescricao').textContent = `Descrição: ${evento.descricao}`;
+                document.getElementById('modalPreco').textContent = `Preço: ${evento.preco} €`;
+
+                // Armazene o eventId no modal para uso posterior
+                document.getElementById('myModal').setAttribute('data-event-id', eventId);
+                localStorage.setItem('eventId', eventId);
+
+                // Exiba o modal
+                document.getElementById('myModal').style.display = 'block';
+            })
+            .catch(error => {
+                console.error("Erro ao buscar os detalhes do evento:", error);
+            });
+    }
+
+
+
+
+
+
+    function closeModal() {
+        // Oculte o modal
+        document.getElementById('myModal').style.display = 'none';
+    }
+
+
+
+
+    // Função para carregar os eventos por categoria
+    function carregarEventosPorCategoria(categoriaId, categoriaNome) {
+        document.getElementById('tituloEventos').textContent = categoriaNome;
+        const eventosContainer = document.getElementById('eventosContainer');
+        eventosContainer.innerHTML = ''; // Limpa os eventos anteriores
+
+        // Faz uma requisição AJAX para carregar os eventos por categoria
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `http://localhost:8080/eventos/listarcat/${categoriaId}`, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const eventos = JSON.parse(xhr.responseText);
+                eventos.forEach(evento => {
+                    const cardEvento = `
+                            <div class="card-evento">
+                                <img src="${evento.foto}" alt="${evento.nome}">
+                                <h3>${evento.nome}</h3>
+                                <p>${evento.descricao || 'Descrição não disponível'}</p>
+                                <button class="botao" id="mais" onclick="openModal(${evento.id})">Ver mais</button>
+                            </div>
+                        `;
+                    eventosContainer.innerHTML += cardEvento;
+                });
+            } else {
+                console.error('Falha ao carregar os eventos por categoria.');
+            }
+        };
+        xhr.send();
+    }
+
+    // Event listener para carregar os eventos por categoria quando um link de categoria é clicado
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault(); // Evita o comportamento padrão de navegação
+            const categoriaId = link.getAttribute('data-categoria-id');
+            const categoriaNome = link.textContent;
+            carregarEventosPorCategoria(categoriaId, categoriaNome);
+        });
+    });
+
+
+
+
+    function abrirmodalcarrinho() {
+        var modal = document.getElementById("modalCarrinho");
+        modal.style.display = "block";
+    }
+
+
+    // Fechar o modal quando o utilizador clicar no 'X'
+    var closeButton = document.getElementsByClassName("close-button-carrinho")[0];
+    closeButton.onclick = function () {
+        var modal = document.getElementById("modalCarrinho");
+        modal.style.display = "none";
+    }
+
+    // PESQUISA
+    const pesquisarEventos = async () => {
+        const termoPesquisa = document.getElementById('search').value.trim();
+
+        if (termoPesquisa.length === 0) {
+            alert('Por favor, insira um termo de pesquisa válido.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/eventos/pesquisar?pesquisa=${termoPesquisa}`);
+            const eventosPesquisados = await response.json();
+
+            if (response.ok) {
+                const eventosContainer = document.getElementById('eventosContainer');
+                eventosContainer.innerHTML = ''; // Limpa os eventos anteriores
+                fecharMenu();
+                document.getElementById('tituloEventos').innerHTML = `Resultados em: <span style="color: blue;">${termoPesquisa}</span>`;
+
+
+
+                eventosPesquisados.forEach(evento => {
+                    const cardEvento = `
+                        <div class="card-evento">
+                            <img src="${evento.foto}" alt="${evento.nome}">
+                            <h3>${evento.nome}</h3>
+                            <p>${evento.descricao || 'Descrição não disponível'}</p>
+                            <button class="botao" id="mais" onclick="openModal(${evento.id})">Ver mais</button>
+                        </div>
+                    `;
+                    eventosContainer.innerHTML += cardEvento;
+                });
+            } else {
+                const eventosContainer = document.getElementById('eventosContainer');
+                eventosContainer.innerHTML = ''; // Limpa os eventos anteriores
+                fecharMenu();
+                document.getElementById('tituloEventos').innerHTML = `Nenhum resultado  em: <span style="color: blue;">${termoPesquisa}</span>`;
+
+
+
+
+            }
+        } catch (error) {
+            console.error('Erro ao pesquisar eventos:', error);
+            alert('Erro ao pesquisar eventos. Por favor, tente novamente mais tarde.');
+        }
+    };
+
+    // Adiciona um event listener para o botão de pesquisa
+    document.getElementById('search-button').addEventListener('click', pesquisarEventos);
+
+    // Adiciona um event listener para a tecla Enter no campo de pesquisa
+    document.getElementById('search').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            pesquisarEventos();
+
+
+        }
+    });
+
+
+    // funcao para criar o carrinho do utilizador usando rota http://localhost:8080/carrinho/adicionar/utilizadorId, se o utilizador dar ja tem carrinho associado dizer na consola
+    async function criarCarrinho() {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.id) {
+                console.error('ID do utilizador não encontrado no localStorage');
+                return;
+            }
+            const utilizadorId = user.id;
+
+            const response = await fetch(`http://localhost:8080/carrinho/adicionar/${utilizadorId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const carrinho = await response.json();
+                localStorage.setItem('carrinhoId', carrinho.id);
+            } else {
+                console.log('Erro ao criar carrinho:', response.status);
+            }
+        } catch (error) {
+            console.error('Erro ao criar carrinho:', error);
+        }
+    }
+
+
+    // Função para obter o carrinho do utilizador
+    async function getCarrinho() {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.id) {
+                console.error('ID do utilizador não encontrado no localStorage');
+                return;
+            }
+            const utilizadorId = user.id;
+            const response = await fetch(`http://localhost:8080/carrinho/listar/${utilizadorId}`);
+            if (response.ok) {
+                const carrinho = await response.json();
+                if (carrinho) {
+                    localStorage.setItem('carrinhoId', carrinho.id);
+                }
+                else {
+                    criarCarrinho();
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao obter carrinho do utilizador:', error);
+        }
+    }
+
+
+
+
+
+    // funcao para adicionar item ao carrinho, id do item no localstorage usar fetch com rota
+    async function adicionarItemAoCarrinho() {
+        try {
+            const carrinhoId = parseInt(localStorage.getItem('carrinhoId'), 10);
+            const eventoId = parseInt(localStorage.getItem('eventId'), 10);
+
+            if (isNaN(carrinhoId)) {
+                console.error('ID do carrinho não encontrado ou inválido no localStorage');
+                return;
+            }
+
+            if (isNaN(eventoId)) {
+                console.error('ID do evento não encontrado ou inválido no localStorage');
+                return;
+            }
+
+            const dados = {
+                carrinhoId: carrinhoId,
+                eventoId: eventoId,
+                quantidade: 1
+            };
+
+            const response = await fetch(`http://localhost:8080/itens/adicionarEvento`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao adicionar item ao carrinho');
+            }
+            else {
+                console.log('Item adicionado ao carrinho com sucesso');
+                showAlert("Item adicionado ao carrinho com sucesso");
+            }
+            const resultado = await response.json();
+            listarItensDoCarrinho();
+
+        } catch (error) {
+            console.error('Erro ao adicionar item ao carrinho:', error);
+        }
+    }
+
+
+
+    // Função para listar os itens no modal do carrinho
+    async function listarItensDoCarrinho() {
+        try {
+            const carrinhoId = localStorage.getItem('carrinhoId');
+            if (isNaN(carrinhoId)) {
+                console.error('ID do carrinho não encontrado ou inválido no localStorage');
+                return;
+            }
+            const response = await fetch(`http://localhost:8080/itens/listarEventos/${carrinhoId}`);
+            if (response.ok) {
+                const resultado = await response.json();
+                const listaCarrinho = document.getElementById('listaCarrinho');
+                listaCarrinho.innerHTML = '';
+                let total = 0;
+                let itemCount = 0; // Contador de itens no carrinho
+
+                resultado.forEach((item) => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                    <div class="evento-info">
+                        <h3>${item.evento.nome}</h3>
+                        <p>€ ${item.evento.preco}</p>
+                    </div>
+                    <div class="quantidade-container">
+                        <button class="botao-quantidade" data-action="minus" data-item-id="${item.id}">-</button>
+                        <span class="quantidade">${item.quantidade}</span>
+                        <button class="botao-quantidade" data-action="plus" data-item-id="${item.id}">+</button>
+                        <button class="botao-eliminar" title="Eliminar item do carrinho" data-item-id="${item.id}">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                    listaCarrinho.appendChild(listItem);
+                    total += item.evento.preco * item.quantidade;
+                    itemCount += item.quantidade; // Atualiza o contador de itens
+                });
+
+                document.getElementById('totalCarrinho').textContent = total.toFixed(2);
+                document.getElementById('cart-count').textContent = itemCount; // Atualiza o número de itens no carrinho
+
+                // Adicionar manipuladores de eventos para os botões de eliminar, aumentar e diminuir quantidade
+                const botoesEliminar = document.querySelectorAll('.botao-eliminar');
+                botoesEliminar.forEach(botao => {
+                    botao.addEventListener('click', async (e) => {
+                        const eventoId = e.currentTarget.getAttribute('data-item-id');
+                        await removerItemDoCarrinho(eventoId);
+                    });
+                });
+
+                const botoesQuantidade = document.querySelectorAll('.botao-quantidade');
+                botoesQuantidade.forEach(botao => {
+                    botao.addEventListener('click', async (e) => {
+                        const eventoId = e.currentTarget.getAttribute('data-item-id');
+                        const action = e.currentTarget.getAttribute('data-action');
+                        if (action === 'plus') {
+                            await alterarQuantidadeItemCarrinho(eventoId, 'increase');
+                        } else if (action === 'minus') {
+                            await alterarQuantidadeItemCarrinho(eventoId, 'decrease');
+                        }
+                    });
+                });
+            } else {
+                console.error('Erro ao listar itens do carrinho');
+            }
+            console.log('Itens do carrinho listados com sucesso');
+        } catch (error) {
+            console.error('Erro ao listar itens do carrinho:', error);
+        }
+    }
+
+    async function removerItemDoCarrinho(eventoId) {
+        try {
+            const response = await fetch(`http://localhost:8080/itens/apagarEvento/${eventoId}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao remover item do carrinho');
+            }
+
+            console.log('Item removido com sucesso');
+            listarItensDoCarrinho();  // Atualiza a lista de itens do carrinho
+        } catch (error) {
+            console.error('Erro ao remover item do carrinho:', error);
+        }
+    }
+
+    async function alterarQuantidadeItemCarrinho(eventoId, action) {
+        try {
+            let url;
+            let novaQuantidade;
+
+            if (action === 'increase') {
+                url = `http://localhost:8080/itens/editarQuantidade/${eventoId}`;
+                novaQuantidade = 1;
+            } else if (action === 'decrease') {
+                url = `http://localhost:8080/itens/editarQuantidade/${eventoId}`;
+                novaQuantidade = -1;
+            } else {
+                console.error('Ação desconhecida para alterar quantidade do item no carrinho');
+                return;
+            }
+
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ novaQuantidade })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro ao ${action === 'increase' ? 'aumentar' : 'diminuir'} quantidade do item no carrinho`);
+            }
+
+            console.log(`Quantidade do item ${action === 'increase' ? 'aumentada' : 'diminuída'} com sucesso`);
+            listarItensDoCarrinho();  // Atualiza a lista de itens do carrinho
+        } catch (error) {
+            console.error(`Erro ao ${action === 'increase' ? 'aumentar' : 'diminuir'} quantidade do item no carrinho:`, error);
+        }
+    }
+
+    async function finalizarCompra() {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.id) {
+                console.error('ID do utilizador não encontrado no localStorage');
+                return;
+            }
+            const utilizadorId = user.id;
+
+            const response = await fetch(`http://localhost:8080/itens/finalizarCompra/${utilizadorId}`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao finalizar a compra');
+            }
+
+            const resultado = await response.json();
+            showAlert("Compra finalizada com sucesso! Obrigado!");
+            window.location.reload();
+
+        } catch (error) {
+            console.error('Erro ao finalizar a compra:', error);
+            alert('Erro ao finalizar a compra');
+        }
+    }
+
+
+    // Função para exibir o modal de alerta
+    function showAlert(message) {
+        const modal = document.getElementById('alert-modal');
+        const alertMessage = document.getElementById('alert-message');
+        alertMessage.textContent = message;
+        modal.style.display = 'block';
+    }
+
+    // Função para fechar o modal de alerta
+    function closeAlert() {
+        const modal = document.getElementById('alert-modal');
+        modal.style.display = 'none';
+    }
+
+    // Fechar o modal quando o botão 'X' ou 'OK' é clicado
+    document.querySelector('.close-alert').addEventListener('click', closeAlert);
+    document.querySelector('#ok-button').addEventListener('click', closeAlert);
+
+    // Fechar o modal quando o utilizador clica fora do conteúdo do modal
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('alert-modal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+
+    function validaToken() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return;
+        }
+
+        fetch('http://localhost:8080/auth/letoken', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ token: token })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Token inválido ou expirado') {
+                    // Se o token expirou ou é inválido, remove o token e redireciona para a página de login
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('carrinhoId');
+                } else {
+                    // Token válido, pode continuar com a inicialização da página
+                    inicializarPagina();
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao validar token:', error);
+                // Em caso de erro na validação do token, redireciona para a página de login
+                localStorage.removeItem('token');
+            });
+    }
+
+    function inicializarPagina() {
+        getCarrinho();
+        // Esconde o elemento com o id 'perfil'
+        document.getElementById('perfil').style.display = 'none';
+
+        // Verifica se existe carrinhoId no localStorage
+        const carrinhoId = localStorage.getItem('carrinhoId');
+        if (carrinhoId !== null) {
+            listarItensDoCarrinho();
+        }
+
+        // Verifica se existe utilizador no localStorage e parseia o JSON
+        const userJson = localStorage.getItem('user');
+        if (userJson) {
+            const user = JSON.parse(userJson);
+
+            // Obtém o nome do utilizador
+            const userName = user.nome;
+
+            // Verifica se o utilizador é admin
+            const isAdmin = user.isAdmin;
+
+            // Se o utilizador não for admin, remove o dashboard
+            if (!isAdmin) {
+                document.getElementById('dashboard').style.display = 'none';
+            }
+
+            // Atualiza o conteúdo do elemento 'user-name' com o nome do utilizador
+            document.getElementById('user-name').textContent = userName;
+        }
+    }
+
+    // Chama validaToken() quando a página for completamente carregada
+    window.onload = function () {
+        validaToken();
+    };
+
+
+
+</script>
+
+</html>

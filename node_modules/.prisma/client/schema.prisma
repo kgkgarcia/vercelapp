@@ -1,0 +1,56 @@
+// schema.prisma
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Utilizador {
+    id        Int        @id @default(autoincrement())
+    nome      String
+    email     String     @unique
+    isAdmin   Boolean    @default(false)
+    password  String
+    numtel    String
+    carrinhos Carrinho[]
+}
+
+model Evento {
+    id                Int              @id @default(autoincrement())
+    nome              String
+    data              DateTime
+    localizacao       String
+    foto              String
+    descricao         String
+    preco             Float
+    quantidade        Int
+    categoria         CategoriaEvento  @relation(fields: [categoriaEventoId], references: [id])
+    categoriaEventoId Int
+    itensCarrinho     ItensCarrinho[]
+}
+
+model CategoriaEvento {
+    id      Int       @id @default(autoincrement())
+    nome    String
+    eventos Evento[]
+}
+
+model Carrinho {
+    id           Int             @id @default(autoincrement())
+    utilizadorId Int
+    utilizador   Utilizador      @relation(fields: [utilizadorId], references: [id])
+    itens        ItensCarrinho[]
+}
+
+model ItensCarrinho {
+    id         Int      @id @default(autoincrement())
+    carrinhoId Int
+    carrinho   Carrinho @relation(fields: [carrinhoId], references: [id])
+    eventoId   Int
+    evento     Evento   @relation(fields: [eventoId], references: [id])
+    quantidade Int
+}
